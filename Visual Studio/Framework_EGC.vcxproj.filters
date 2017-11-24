@@ -1,0 +1,156 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Core">
+      <UniqueIdentifier>{9494f307-c1ec-49c3-b3a2-e8bd3267d84e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Window">
+      <UniqueIdentifier>{a3d208ce-c616-4e32-9d2d-f8e8825c59cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{1d2eb2cb-c2cc-41b4-af6d-395b05f55a04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\GPU">
+      <UniqueIdentifier>{271e5bd2-7cb3-40b7-b2e5-5e343c58f910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Managers">
+      <UniqueIdentifier>{2940a1fd-9fef-46a7-93fb-a8241118d00a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TheGame">
+      <UniqueIdentifier>{a2adfb55-9736-49cf-a712-d5c6e3c7923c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{5deda5fc-81e7-4778-b944-0c73d6af7661}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders">
+      <UniqueIdentifier>{41713137-7629-4b4f-9f35-ac7393f0ce91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TheGame\Generators">
+      <UniqueIdentifier>{edb185f0-4389-4d0f-b5aa-7878a9304d66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TheGame\Watter">
+      <UniqueIdentifier>{7dfb3239-7a09-4cc2-ba56-32145ee24642}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Source\Core\Engine.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\World.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\include\gl.cpp">
+      <Filter>include</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\Window\WindowObject.cpp">
+      <Filter>Core\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GPU\Shader.cpp">
+      <Filter>Core\GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Main.cpp" />
+    <ClCompile Include="..\Source\Core\Window\WindowCallbacks.cpp">
+      <Filter>Core\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GPU\Mesh.cpp">
+      <Filter>Core\GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GPU\Texture2D.cpp">
+      <Filter>Core\GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\Managers\TextureManager.cpp">
+      <Filter>Core\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\Window\InputController.cpp">
+      <Filter>Core\Window</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\Core\GPU\GPUBuffers.cpp">
+      <Filter>Core\GPU</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mCamera.cpp">
+      <Filter>TheGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mScene.cpp">
+      <Filter>TheGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mBuilder.cpp">
+      <Filter>TheGame\Generators</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mWatter.cpp">
+      <Filter>TheGame\Watter</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Source\Core\World.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\Engine.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\include\gl.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\include\glm.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\include\math.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\include\utils.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\Window\WindowObject.h">
+      <Filter>Core\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GPU\Shader.h">
+      <Filter>Core\GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\Window\WindowCallbacks.h">
+      <Filter>Core\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GPU\Mesh.h">
+      <Filter>Core\GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GPU\Texture2D.h">
+      <Filter>Core\GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\Managers\ResourcePath.h">
+      <Filter>Core\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\Managers\TextureManager.h">
+      <Filter>Core\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\Window\InputController.h">
+      <Filter>Core\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\Core\GPU\GPUBuffers.h">
+      <Filter>Core\GPU</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mCamera.h">
+      <Filter>TheGame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mScene.h">
+      <Filter>TheGame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mBuilder.h">
+      <Filter>TheGame\Generators</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mWatter.h">
+      <Filter>TheGame\Watter</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Resources\Shaders\FragmentShader.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\VertexShader.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\WFShader.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\WVShader.glsl">
+      <Filter>Resources\Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>
