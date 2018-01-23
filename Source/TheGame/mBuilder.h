@@ -187,14 +187,13 @@ public:
 	}
 
 
-	Mesh* GetMesh() {
+	Mesh* GetMesh(std::string name) {
 		int width = _map->dz;
 		int length = _map->dx;
 		float** heightMap = _map->map;
 
 		double lineLength = 1;
-		std::string name = "terrain";
-
+		
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec2> texCoords;

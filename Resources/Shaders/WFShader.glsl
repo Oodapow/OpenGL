@@ -1,13 +1,6 @@
 #version 330 core
 out vec4 FragColor;
 
-struct Material {
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;    
-    float shininess;
-}; 
-
 struct Light {
 	vec3 direction;
     vec3 ambient;
@@ -27,6 +20,12 @@ uniform sampler2D refraction;
 
 void main()
 {
+	float alpha = dot(normalize(viewPos - FragPos), vec3(0.0, 1.0, 0.0));
 	vec2 ndc = (ClipSpace.xy/ClipSpace.w) / 2 + 0.5;
-	FragColor = texture(refraction, vec2(ndc.x, -ndc.y));
+
+	vec4 refleC = texture(reflection, vec2(ndc.x, -ndc.y));
+	vec4 refraC = texture(refraction, ndc);
+
+	FragColor = mix(refleC, refraC, alpha);
+	FragColor = mix(FragColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2);
 } 

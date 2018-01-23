@@ -33,6 +33,7 @@
     <ClCompile Include="..\Source\Main.cpp" />
     <ClCompile Include="..\Source\TheGame\mBuilder.cpp" />
     <ClCompile Include="..\Source\TheGame\mCamera.cpp" />
+    <ClCompile Include="..\Source\TheGame\mObject.cpp" />
     <ClCompile Include="..\Source\TheGame\mScene.cpp" />
     <ClCompile Include="..\Source\TheGame\mWatter.cpp" />
   </ItemGroup>
@@ -54,6 +55,7 @@
     <ClInclude Include="..\Source\include\utils.h" />
     <ClInclude Include="..\Source\TheGame\mBuilder.h" />
     <ClInclude Include="..\Source\TheGame\mCamera.h" />
+    <ClInclude Include="..\Source\TheGame\mObject.h" />
     <ClInclude Include="..\Source\TheGame\mScene.h" />
     <ClInclude Include="..\Source\TheGame\mWatter.h" />
   </ItemGroup>

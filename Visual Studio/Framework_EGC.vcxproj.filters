@@ -79,6 +79,9 @@
     <ClCompile Include="..\Source\TheGame\mWatter.cpp">
       <Filter>TheGame\Watter</Filter>
     </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mObject.cpp">
+      <Filter>TheGame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Core\World.h">
@@ -137,6 +140,9 @@
     </ClInclude>
     <ClInclude Include="..\Source\TheGame\mWatter.h">
       <Filter>TheGame\Watter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mObject.h">
+      <Filter>TheGame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

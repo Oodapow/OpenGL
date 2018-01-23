@@ -49,14 +49,6 @@ void mScene::Init()
 	}
 
 	{
-		Shader *shader = new Shader("watter");
-		shader->AddShader(RESOURCE_PATH::SHADERS + "WVShader.glsl", GL_VERTEX_SHADER);
-		shader->AddShader(RESOURCE_PATH::SHADERS + "WFShader.glsl", GL_FRAGMENT_SHADER);
-		shader->CreateAndLink();
-		shaders[shader->GetName()] = shader;
-	}
-
-	{
 		Builder b(size, size, 10);
 
 		b.AddOffset(2);
@@ -66,11 +58,19 @@ void mScene::Init()
 		b.AddMiddlePoint(0.25);
 		b.Blur();
 
-		auto mesh = b.GetMesh();
+		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 
-		auto mesh2 = mWatter::GetMesh(b.Getdx(), b.Getdz(), 0.0f,  1.0f);
-		meshes[mesh2->GetMeshID()] = mesh2;
+		watter = new mWatter();
+		watter->mesh = "watter";
+		watter->shader = "watter";
+		watter->position = glm::vec3(0);
+		auto wmesh = watter->InitMesh(b.Getdx(), b.Getdz(), 0.0f,  1.0f);
+		meshes[wmesh->GetMeshID()] = wmesh;
+		auto wshader = watter->InitShader();
+		shaders[wshader->GetName()] = wshader;
+		watter->BuildReflectionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
+		watter->BuildRefractionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
 	}
 
 	{
@@ -79,36 +79,6 @@ void mScene::Init()
 		obj->shader = "light";
 		obj->position = glm::vec3(0);
 		objects.push_back(obj);
-	}
-
-	{
-		watter = new mObject();
-		watter->mesh = "watter";
-		watter->shader = "watter";
-		watter->position = glm::vec3(0);
-	}
-
-	{
-		glGenFramebuffers(1, &framebuffer);
-		glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-		// create a color attachment texture
-		glGenTextures(1, &textureColorbuffer);
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-		// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-		glGenRenderbuffers(1, &rbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y); // use a single renderbuffer object for both a depth AND stencil buffer.
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-																									  // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		shaders["watter"]->loc_textures[0] = textureColorbuffer;
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -128,7 +98,7 @@ void mScene::Update(float deltaTimeSeconds)
 	// render
 	// ------
 	// bind to framebuffer and draw scene as we normally would to color texture 
-	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+	watter->BindReflectionBuffer();
 	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 
 							 // make sure we clear the framebuffer's content
@@ -137,7 +107,7 @@ void mScene::Update(float deltaTimeSeconds)
 	glEnable(GL_CLIP_DISTANCE0);
 	plane = glm::vec4(0, 1, 0, 0);
 
-	float distance = 2 * (camera->Position.y);
+	float distance = 2 * (camera->Position.y) - watter->position.y;
 	camera->Position.y -= distance;
 	camera->InvertPitch();
 
@@ -148,6 +118,19 @@ void mScene::Update(float deltaTimeSeconds)
 
 	camera->InvertPitch();
 	camera->Position.y += distance;
+
+	watter->BindRefractionBuffer();
+	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
+
+	glClearColor(0.2, 0.3, 0.7, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_CLIP_DISTANCE0);
+	plane = glm::vec4(0, -1, 0, 0);
+
+	for (auto it = objects.begin(); it != objects.end(); it++)
+	{
+		RenderObject(*(*it));
+	}
 
 	// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -259,7 +242,7 @@ void mScene::OnKeyPress(int key, int mods)
 		b.AddMiddlePoint(0.25);
 		b.Blur();
 
-		auto mesh = b.GetMesh();
+		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
 
@@ -276,7 +259,7 @@ void mScene::OnKeyPress(int key, int mods)
 		b.AddMiddlePoint(0.25);
 		b.Blur();
 
-		auto mesh = b.GetMesh();
+		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
 
@@ -294,7 +277,7 @@ void mScene::OnKeyPress(int key, int mods)
 		b.AddMiddlePoint(0.25);
 		b.Blur();
 
-		auto mesh = b.GetMesh();
+		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
 
@@ -312,7 +295,7 @@ void mScene::OnKeyPress(int key, int mods)
 		b.AddMiddlePoint(0.25);
 		b.Blur();
 
-		auto mesh = b.GetMesh();
+		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
 
@@ -358,5 +341,7 @@ void mScene::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
 
 void mScene::OnWindowResize(int width, int height)
 {
-
+	{
+		watter->ResizeTextureBuffers(width, height);
+	}
 }
