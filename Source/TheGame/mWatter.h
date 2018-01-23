@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <Core/Engine.h>
-
+#include <Core/GPU/Texture2D.h>
 #include "mObject.h"
 
 class mWatter : public mObject{
@@ -13,7 +13,6 @@ public:
 		glBindFramebuffer(GL_FRAMEBUFFER, reflectionFramebuffer);
 		// create a color attachment texture
 		glGenTextures(1, &reflectionTextureColorbuffer);
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, reflectionTextureColorbuffer);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -38,7 +37,6 @@ public:
 		glBindFramebuffer(GL_FRAMEBUFFER, refractionFramebuffer);
 		// create a color attachment texture
 		glGenTextures(1, &refractionTextureColorbuffer);
-		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, refractionTextureColorbuffer);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -65,18 +63,31 @@ public:
 
 	void BindReflectionBuffer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, reflectionFramebuffer);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, reflectionTextureColorbuffer);
 	}
 
 	void BindRefractionBuffer() {
 		glBindFramebuffer(GL_FRAMEBUFFER, refractionFramebuffer);
+	}
+
+	void BindTextures() {
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, reflectionTextureColorbuffer);
+
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, refractionTextureColorbuffer);
+
+		normalMap->BindToTextureUnit(GL_TEXTURE2);
+		dudvMap->BindToTextureUnit(GL_TEXTURE3);
 	}
 
 	void InitTextureMaps() {
-		
+		normalMap = new Texture2D();
+		normalMap->Load2D(RESOURCE_PATH::TEXTURES + "normal.png");
+		_shader->loc_textures[2] = glGetUniformLocation(_shader->program, "normalMap");
+
+		dudvMap = new Texture2D();
+		dudvMap->Load2D(RESOURCE_PATH::TEXTURES + "waterDUDV.png");
+		_shader->loc_textures[3] = glGetUniformLocation(_shader->program, "dudvMap");
 	}
 
 	Shader* InitShader() {
@@ -92,17 +103,28 @@ public:
 		std::string name = mesh;
 
 		std::vector<glm::vec3> positions;
+		std::vector<glm::vec2> texCoords;
 		std::vector<unsigned short> indices;
 
 		glm::vec3 p1 = glm::vec3(-dx / 2 * line, y, -dz / 2 * line);
-		glm::vec3 p2 = glm::vec3(-dx / 2 * line, y, (dz / 2 + 1) * line);
-		glm::vec3 p3 = glm::vec3((dx / 2 + 1) * line, y, -dz / 2 * line);
-		glm::vec3 p4 = glm::vec3((dx / 2 + 1) * line, y, (dz / 2 + 1) * line);
+		glm::vec3 p2 = glm::vec3(-dx / 2 * line, y, dz / 2 * line);
+		glm::vec3 p3 = glm::vec3(dx / 2 * line, y, -dz / 2 * line);
+		glm::vec3 p4 = glm::vec3(dx / 2  * line, y, dz / 2 * line);
 
 		positions.push_back(p1);
 		positions.push_back(p2);
 		positions.push_back(p3);
 		positions.push_back(p4);
+
+		glm::vec2 t1 = glm::vec2(0, dz * line);
+		glm::vec2 t2 = glm::vec2(0, 0);
+		glm::vec2 t3 = glm::vec2(dx * line, dz * line);
+		glm::vec2 t4 = glm::vec2(dx * line, 0);
+
+		texCoords.push_back(t1);
+		texCoords.push_back(t2);
+		texCoords.push_back(t3);
+		texCoords.push_back(t4);
 
 		indices.push_back(0);
 		indices.push_back(1);
@@ -112,7 +134,7 @@ public:
 		indices.push_back(2);
 
 		_mesh = new Mesh(name);
-		_mesh->InitFromData(positions, indices);
+		_mesh->InitFromData(positions, texCoords, indices);
 		return _mesh;
 	}
 private:
@@ -123,6 +145,9 @@ private:
 	unsigned int refractionFramebuffer = -1;
 	unsigned int refractionTextureColorbuffer = -1;
 	unsigned int refractionRbo = -1;
+
+	Texture2D* normalMap = NULL;
+	Texture2D* dudvMap = NULL;
 
 	Mesh* _mesh;
 	Shader* _shader;

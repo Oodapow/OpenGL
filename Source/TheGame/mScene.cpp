@@ -30,7 +30,7 @@ void mScene::Init()
 		light.direction = glm::normalize(glm::vec3(0, -1.0f, 0));
 		light.ambient = glm::vec3(0.4f, 0.4f, 0.4f);
 		light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
-		light.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+		light.specular = glm::vec3(0.3f, 0.3f, 0.3f);
 	}
 
 	{
@@ -71,6 +71,7 @@ void mScene::Init()
 		shaders[wshader->GetName()] = wshader;
 		watter->BuildReflectionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
 		watter->BuildRefractionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
+		watter->InitTextureMaps();
 	}
 
 	{
@@ -93,6 +94,7 @@ void mScene::FrameStart()
 
 void mScene::Update(float deltaTimeSeconds)
 {
+	windOffset += deltaTimeSeconds * windSpeed;
 	camera->UpdateCameraVectors();
 
 	// render
@@ -120,6 +122,7 @@ void mScene::Update(float deltaTimeSeconds)
 	camera->Position.y += distance;
 
 	watter->BindRefractionBuffer();
+
 	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 
 	glClearColor(0.2, 0.3, 0.7, 1);
@@ -139,6 +142,7 @@ void mScene::Update(float deltaTimeSeconds)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CLIP_DISTANCE0);
 
+	watter->BindTextures();
 	RenderObject(*watter);
 
 	for (auto it = objects.begin(); it != objects.end(); it++)
@@ -163,13 +167,13 @@ void mScene::RenderObject(const mObject& object)
 		{
 			RenderObject(**it);
 		}
-
 	}
 
 	shaders[object.shader]->Use();
 	shaders[object.shader]->BindTexturesUnits();
 
 	shaders[object.shader]->setVec4("plane", plane);
+	shaders[object.shader]->setFloat("windOffset", windOffset);
 
 	shaders[object.shader]->setVec3("light.direction", light.direction);
 	shaders[object.shader]->setVec3("light.ambient", light.ambient);
@@ -309,6 +313,14 @@ void mScene::OnKeyPress(int key, int mods)
 		}
 
 		visible = !visible;
+	}
+
+	if (key == GLFW_KEY_9)
+	{
+		for (auto it = shaders.begin(); it != shaders.end(); it++)
+		{
+			(*it).second->Reload();
+		}
 	}
 }
 

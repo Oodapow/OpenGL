@@ -46,6 +46,13 @@ bool Mesh::InitFromData(vector<glm::vec3>& positions, vector<unsigned short>& in
 	return buffers->VAO != 0;
 }
 
+bool Mesh::InitFromData(vector<glm::vec3>& positions, vector<glm::vec2>& texCoords, vector<unsigned short>& indices)
+{
+	nrIndices = indices.size();
+	*buffers = UtilsGPU::UploadData(positions, texCoords, indices);
+	return buffers->VAO != 0;
+}
+
 GLenum Mesh::GetDrawMode() const
 {
 	return glDrawMode;

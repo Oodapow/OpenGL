@@ -1,6 +1,7 @@
 #pragma once
 #include <include/gl.h>
 #include <include/utils.h>
+#include <string>
 
 class Texture2D
 {
@@ -19,7 +20,7 @@ class Texture2D
 		void Create(const unsigned char* img, int width, int height, int chn);
 		void CreateU16(const unsigned short* img, int width, int height, int chn);
 
-		bool Load2D(const char* fileName, GLenum wrappingMode = GL_REPEAT);
+		bool Load2D(std::string fileName, GLenum wrappingMode = GL_REPEAT);
 		void SaveToFile(const char* fileName) const;
 
 		unsigned int GetWidth() const;

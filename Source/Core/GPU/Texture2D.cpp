@@ -58,10 +58,10 @@ void Texture2D::Init(GLuint gpuTextureID, unsigned int width, unsigned int heigh
 	this->channels = channels;
 }
 
-bool Texture2D::Load2D(const char* fileName, GLenum wrapping_mode)
+bool Texture2D::Load2D(std::string fileName, GLenum wrapping_mode)
 {
 	int width, height, chn;
-	unsigned char *data = stbi_load(fileName, &width, &height, &chn, 0);
+	unsigned char *data = stbi_load(fileName.c_str(), &width, &height, &chn, 0);
 
 	if (data == NULL) {
 		#ifdef DEBUG_INFO

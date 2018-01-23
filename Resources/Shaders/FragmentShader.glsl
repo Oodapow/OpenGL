@@ -41,7 +41,7 @@ void main()
 		mdiffuse = vec3(red, green, blue);
 	}
 
-    vec3 ambient = light.ambient * material.ambient;
+    vec3 ambient = light.ambient * mdiffuse * 0.3;
   	
     // diffuse 
     vec3 norm = normalize(Normal);

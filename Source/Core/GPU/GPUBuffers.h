@@ -36,4 +36,8 @@ namespace UtilsGPU
 
 	GPUBuffers UploadData(const std::vector<glm::vec3> &vertices,
 							const std::vector<unsigned short>& indices);
+
+	GPUBuffers UploadData(const std::vector<glm::vec3> &positions, 
+							const std::vector<glm::vec2>& texCoords,
+							const std::vector<unsigned short>& indices);
 }

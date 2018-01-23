@@ -28,6 +28,8 @@ class Mesh
 
 		bool InitFromData(std::vector<glm::vec3>& positions, std::vector<unsigned short>& indices);
 
+		bool InitFromData(std::vector<glm::vec3>& positions, std::vector<glm::vec2>& texCoords, std::vector<unsigned short>& indices);
+
 		// GL_POINTS, GL_TRIANGLES, GL_LINES, GL_LINE_STRIP, GL_LINE_LOOP, GL_LINE_STRIP_ADJACENCY, GL_LINES_ADJACENCY,
 		// GL_TRIANGLE_STRIP, GL_TRIANGLE_FAN, GL_TRIANGLE_STRIP_ADJACENCY, GL_TRIANGLES_ADJACENCY
 		void SetDrawMode(GLenum primitive);

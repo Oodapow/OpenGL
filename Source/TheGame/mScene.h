@@ -44,6 +44,9 @@ private:
 	int size = 14;
 	bool visible = false;
 
+	float windOffset = 0;
+	float windSpeed = 0.3;
+
 	std::vector<mObject*> objects;
 	mWatter* watter;
 
