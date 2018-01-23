@@ -9,14 +9,14 @@ struct Light {
 };
 
 in vec3 FragPos;  
-in vec3 Normal;  
-in vec2 TexCoords;
 in vec4 ClipSpace;
 
 uniform vec3 viewPos;
 uniform Light light;
 uniform sampler2D reflection;
 uniform sampler2D refraction;
+uniform sampler2D dudvMap;
+uniform sampler2D normalMap;
 
 void main()
 {

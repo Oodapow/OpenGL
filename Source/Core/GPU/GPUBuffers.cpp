@@ -100,7 +100,7 @@ namespace UtilsGPU
 		return buffers;
 	}
 
-	GPUBuffers UploadData(const std::vector<VertexFormat> &vertices, const std::vector<unsigned short>& indices)
+	GPUBuffers UploadData(const std::vector<glm::vec3> &positions, const std::vector<unsigned short>& indices)
 	{
 		// Create the VAO
 		GPUBuffers buffers;
@@ -109,19 +109,9 @@ namespace UtilsGPU
 
 		// Generate and populate the buffers with vertex attributes and the indices
 		glBindBuffer(GL_ARRAY_BUFFER, buffers.VBO[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), 0);
-
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(sizeof(glm::vec3)));
-
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3)));
-
-		glEnableVertexAttribArray(3);
-		glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(VertexFormat), (void*)(2 * sizeof(glm::vec3) + sizeof(glm::vec2)));
+		glBufferData(GL_ARRAY_BUFFER, sizeof(positions[0]) * positions.size(), &positions[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(VERTEX_ATTRIBUTE_LOC::POS);
+		glVertexAttribPointer(VERTEX_ATTRIBUTE_LOC::POS, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers.VBO[1]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indices.size(), &indices[0], GL_STATIC_DRAW);

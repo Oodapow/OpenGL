@@ -34,6 +34,6 @@ namespace UtilsGPU
 							const std::vector<glm::vec2> &text_coords,
 							const std::vector<unsigned short> &indices);
 
-	GPUBuffers UploadData(const std::vector<VertexFormat> &vertices,
+	GPUBuffers UploadData(const std::vector<glm::vec3> &vertices,
 							const std::vector<unsigned short>& indices);
 }

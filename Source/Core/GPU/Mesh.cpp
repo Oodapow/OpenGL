@@ -28,6 +28,7 @@ const char * Mesh::GetMeshID() const
 {
 	return meshID.c_str();
 }
+
 bool Mesh::InitFromData(vector<glm::vec3>& positions,
 						vector<glm::vec3>& normals,
 						vector<glm::vec2>& texCoords,
@@ -35,6 +36,13 @@ bool Mesh::InitFromData(vector<glm::vec3>& positions,
 {
 	nrIndices = indices.size();
 	*buffers = UtilsGPU::UploadData(positions, normals, texCoords, indices);
+	return buffers->VAO != 0;
+}
+
+bool Mesh::InitFromData(vector<glm::vec3>& positions, vector<unsigned short>& indices)
+{
+	nrIndices = indices.size();
+	*buffers = UtilsGPU::UploadData(positions, indices);
 	return buffers->VAO != 0;
 }
 
