@@ -49,14 +49,7 @@ void mScene::Init()
 	}
 
 	{
-		Builder b(size, size, 10);
-
-		b.AddOffset(2);
-		b.AddNoise(count);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.25);
-		b.Blur();
+		Builder b(size, size, 11);
 
 		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
@@ -238,14 +231,6 @@ void mScene::OnKeyPress(int key, int mods)
 		delete meshes["terrain"];
 		meshes.erase("terrain");
 		Builder b(size, size, 10);
-
-		b.AddOffset(2);
-		b.AddNoise(--count);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.25);
-		b.Blur();
-
 		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
@@ -255,14 +240,6 @@ void mScene::OnKeyPress(int key, int mods)
 		delete meshes["terrain"];
 		meshes.erase("terrain");
 		Builder b(size, size, 10);
-
-		b.AddOffset(2);
-		b.AddNoise(++count);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.25);
-		b.Blur();
-
 		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
@@ -273,14 +250,6 @@ void mScene::OnKeyPress(int key, int mods)
 		meshes.erase("terrain");
 		size--;
 		Builder b(size, size, 10);
-
-		b.AddOffset(2);
-		b.AddNoise(count);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.25);
-		b.Blur();
-
 		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}
@@ -291,14 +260,6 @@ void mScene::OnKeyPress(int key, int mods)
 		meshes.erase("terrain");
 		size++;
 		Builder b(size, size, 10);
-
-		b.AddOffset(2);
-		b.AddNoise(count);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.5);
-		b.AddMiddlePoint(0.25);
-		b.Blur();
-
 		auto mesh = b.GetMesh("terrain");
 		meshes[mesh->GetMeshID()] = mesh;
 	}

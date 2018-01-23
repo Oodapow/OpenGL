@@ -1,196 +1,196 @@
 #pragma once
 #include <random>
+# include <cstdint>
+# include <numeric>
+# include <algorithm>
 
 #include <Core/GPU/Mesh.h>
 #include <glm/glm.hpp>
 
-class Map {
+class PerlinNoise
+{
+private:
+
+	std::int32_t p[512];
+
+	static double Fade(double t) noexcept
+	{
+		return t * t * t * (t * (t * 6 - 15) + 10);
+	};
+
+	static double Lerp(double t, double a, double b) noexcept
+	{
+		return a + t * (b - a);
+	};
+
+	static double Grad(std::int32_t hash, double x, double y, double z) noexcept
+	{
+		const std::int32_t h = hash & 15;
+		const double u = h < 8 ? x : y;
+		const double v = h < 4 ? y : h == 12 || h == 14 ? x : z;
+		return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+	};
+
 public:
-	Map(unsigned int dx, unsigned int dz) : dz(dz), dx(dx) {
-		map = new float*[dz];
-		for (int i = 0; i < dz; i++) {
-			map[i] = new float[dx];
-			for (int j = 0; j < dx; j++) {
-				map[i][j] = 0;
-			}
+
+	explicit PerlinNoise(std::uint32_t seed = std::default_random_engine::default_seed)
+	{
+		reseed(seed);
+	};
+
+	void reseed(std::uint32_t seed)
+	{
+		for (size_t i = 0; i < 256; ++i)
+		{
+			p[i] = i;
+		}
+
+		std::shuffle(std::begin(p), std::begin(p) + 256, std::default_random_engine(seed));
+
+		for (size_t i = 0; i < 256; ++i)
+		{
+			p[256 + i] = p[i];
 		}
 	};
 
-	~Map() {
-		for (int i = 0; i < dz; i++) {
-			delete map[i];
-		}
-		delete map;
+	double noise(double x) const
+	{
+		return noise(x, 0.0, 0.0);
 	};
 
-	bool GetValue(unsigned int z, unsigned int x, float* value) {
-		if (x < 0 || z < 0 || x >= dx || z >= dz) {
-			return false;
-		}
-		(*value) = map[z][x];
-		return true;
-	}
+	double noise(double x, double y) const
+	{
+		return noise(x, y, 0.0);
+	};
 
-	float** map;
-	const unsigned int dx;
-	const unsigned int dz;
+	double noise(double x, double y, double z) const
+	{
+		const std::int32_t X = static_cast<std::int32_t>(std::floor(x)) & 255;
+		const std::int32_t Y = static_cast<std::int32_t>(std::floor(y)) & 255;
+		const std::int32_t Z = static_cast<std::int32_t>(std::floor(z)) & 255;
+
+		x -= std::floor(x);
+		y -= std::floor(y);
+		z -= std::floor(z);
+
+		const double u = Fade(x);
+		const double v = Fade(y);
+		const double w = Fade(z);
+
+		const std::int32_t A = p[X] + Y, AA = p[A] + Z, AB = p[A + 1] + Z;
+		const std::int32_t B = p[X + 1] + Y, BA = p[B] + Z, BB = p[B + 1] + Z;
+
+		return Lerp(w, Lerp(v, Lerp(u, Grad(p[AA], x, y, z),
+			Grad(p[BA], x - 1, y, z)),
+			Lerp(u, Grad(p[AB], x, y - 1, z),
+				Grad(p[BB], x - 1, y - 1, z))),
+			Lerp(v, Lerp(u, Grad(p[AA + 1], x, y, z - 1),
+				Grad(p[BA + 1], x - 1, y, z - 1)),
+				Lerp(u, Grad(p[AB + 1], x, y - 1, z - 1),
+					Grad(p[BB + 1], x - 1, y - 1, z - 1))));
+	};
+
+	double octaveNoise(double x, std::int32_t octaves) const
+	{
+		double result = 0.0;
+		double amp = 1.0;
+
+		for (std::int32_t i = 0; i < octaves; ++i)
+		{
+			result += noise(x) * amp;
+			x *= 2.0;
+			amp *= 0.5;
+		}
+
+		return result;
+	};
+
+	double octaveNoise(double x, double y, std::int32_t octaves) const
+	{
+		double result = 0.0;
+		double amp = 1.0;
+
+		for (std::int32_t i = 0; i < octaves; ++i)
+		{
+			result += noise(x, y) * amp;
+			x *= 2.0;
+			y *= 2.0;
+			amp *= 0.5;
+		}
+
+		return result;
+	};
+
+	double octaveNoise(double x, double y, double z, std::int32_t octaves) const
+	{
+		double result = 0.0;
+		double amp = 1.0;
+
+		for (std::int32_t i = 0; i < octaves; ++i)
+		{
+			result += noise(x, y, z) * amp;
+			x *= 2.0;
+			y *= 2.0;
+			z *= 2.0;
+			amp *= 0.5;
+		}
+
+		return result;
+	};
+
+	double noise0_1(double x) const
+	{
+		return noise(x) * 0.5 + 0.5;
+	};
+
+	double noise0_1(double x, double y) const
+	{
+		return noise(x, y) * 0.5 + 0.5;
+	};
+
+	double noise0_1(double x, double y, double z) const
+	{
+		return noise(x, y, z) * 0.5 + 0.5;
+	};
+
+	double octaveNoise0_1(double x, std::int32_t octaves) const
+	{
+		return octaveNoise(x, octaves) * 0.5 + 0.5;
+	};
+
+	double octaveNoise0_1(double x, double y, std::int32_t octaves) const
+	{
+		return octaveNoise(x, y, octaves) * 0.5 + 0.5;
+	};
+
+	double octaveNoise0_1(double x, double y, double z, std::int32_t octaves) const
+	{
+		return octaveNoise(x, y, z, octaves) * 0.5 + 0.5;
+	};
 };
 
 class Builder 
 {
 public:
-	Builder(unsigned int dx, unsigned int dz, long unsigned int seed) : _eng{ seed }, _seed(seed) {
-		_map = new Map(dx, dz);
+	Builder(unsigned int dx, unsigned int dz, long unsigned int seed) : dx(dx), dz(dz) {
+		noise = new PerlinNoise(seed);
 	};
 
 	~Builder() {
-		delete _map;
+		delete noise;
 	}
 
-	unsigned int Getdx() { return _map->dx; };
-	unsigned int Getdz() { return _map->dz; };
-
-	void AddMiddlePoint(float offset) {
-		auto oldMap = _map;
-	
-		_map = new Map(2 * oldMap->dx - 1, 2 * oldMap->dz - 1);
-
-		for (int i = 0; i < _map->dz; i++) {
-			for (int j = 0; j < _map->dx; j++) {
-				if (i % 2 == 0 && j % 2 == 0) {
-					_map->map[i][j] = std::normal_distribution<float>(oldMap->map[i / 2][j / 2], offset)(_eng);
-				}
-				else
-				if (i % 2 == 1 && j % 2 == 1) {
-					float sum = 0;
-					unsigned int total = 0;
-
-					float current;
-
-					if (oldMap->GetValue(i / 2, j / 2, &current)) {
-						sum += current;
-						total++;
-					}
-
-					if (oldMap->GetValue(i / 2 + 1, j / 2, &current)) {
-						sum += current;
-						total++;
-					}
-
-					if (oldMap->GetValue(i / 2, j / 2 + 1, &current)) {
-						sum += current;
-						total++;
-					}
-
-					if (oldMap->GetValue(i / 2 + 1, j / 2 + 1, &current)) {
-						sum += current;
-						total++;
-					}
-
-					_map->map[i][j] = std::normal_distribution<float>(sum / total, offset)(_eng);
-				}
-				else if (i % 2 == 1) {
-					float sum = 0;
-					unsigned int total = 0;
-
-					float current;
-
-					if (oldMap->GetValue(i / 2, j / 2, &current)) {
-						sum += current;
-						total++;
-					}
-
-					if (oldMap->GetValue(i / 2 + 1, j / 2, &current)) {
-						sum += current;
-						total++;
-					}
-
-					_map->map[i][j] = std::normal_distribution<float>(sum / total, offset)(_eng);
-				}
-				else {
-					float sum = 0;
-					unsigned int total = 0;
-
-					float current;
-
-					if (oldMap->GetValue(i / 2, j / 2, &current)) {
-						sum += current;
-						total++;
-					}
-
-					if (oldMap->GetValue(i / 2, j / 2 + 1, &current)) {
-						sum += current;
-						total++;
-					}
-
-					_map->map[i][j] = std::normal_distribution<float>(sum / total, offset)(_eng);
-				}
-			}
-		}
-
-		delete oldMap;
+	unsigned int Getdx() {
+		return dx;
 	}
 
-	void Blur() {
-		auto oldMap = _map;
-		_map = new Map(oldMap->dx, oldMap->dz);
-
-		float gaussianMat[3][3] = {
-			{ 16, 8, 16},
-			{ 8, 4, 8},
-			{ 16,8, 16} };
-
-		for (int i = 0; i < _map->dz; i++)
-		{
-			for (int j = 0; j < _map->dx; j++)
-			{
-				float sum = 0;
-				for (int ii = -1; ii < 2; ii++)
-				{
-					for (int jj = -1; jj < 2; jj++)
-					{
-						int diffii = i + ii;
-						int diffjj = j + jj;
-
-						if (diffii < 0 || diffjj < 0 || diffii == _map->dz || diffjj == _map->dx)
-						{
-							continue;
-						}
-						sum += oldMap->map[diffii][diffjj] / gaussianMat[ii + 1][jj + 1];
-					}
-				}
-				_map->map[i][j] = sum;
-			}
-		}
-
-		delete oldMap;
+	unsigned int Getdz() {
+		return dz;
 	}
-
-	void AddNoise(float offset) {
-		for (int i = 0; i < _map->dz; i++)
-		{
-			for (int j = 0; j < _map->dx; j++)
-			{
-				_map->map[i][j] = std::normal_distribution<float>(_map->map[i][j], offset)(_eng);
-			}
-		}
-	}
-
-	void AddOffset(float offset) {
-		for (int i = 0; i < _map->dz; i++)
-		{
-			for (int j = 0; j < _map->dx; j++)
-			{
-				_map->map[i][j] += offset;
-			}
-		}
-	}
-
 
 	Mesh* GetMesh(std::string name) {
-		int width = _map->dz;
-		int length = _map->dx;
-		float** heightMap = _map->map;
+		int width = dz;
+		int length = dx;
 
 		double lineLength = 1;
 		
@@ -203,12 +203,20 @@ public:
 
 		for (int i = 0; i < length - 1; i++) {
 			for (int j = 0; j < width - 1; j++) {
-				int jj = (j - width / 2);
-				int ii = (i - length / 2);
-				glm::vec3 p1 = glm::vec3(jj * lineLength, heightMap[i][j], ii*lineLength);
-				glm::vec3 p2 = glm::vec3((jj + 1)*lineLength, heightMap[i][j + 1], ii*lineLength);
-				glm::vec3 p3 = glm::vec3(jj*lineLength, heightMap[i + 1][j], (ii + 1)*lineLength);
-				glm::vec3 p4 = glm::vec3((jj + 1)*lineLength, heightMap[i + 1][j + 1], (ii + 1)*lineLength);
+				float jj = (j - width / 2);
+				float ii = (i - length / 2);
+				float jj1 = jj + 1;
+				float ii1 = ii + 1;
+
+				ii *= lineLength;
+				ii1 *= lineLength;
+				jj *= lineLength;
+				jj1 *= lineLength;
+
+				glm::vec3 p1 = glm::vec3(jj, getHValue(ii / length, jj / width), ii);
+				glm::vec3 p2 = glm::vec3(jj1, getHValue(ii / length, jj1 / width), ii);
+				glm::vec3 p3 = glm::vec3(jj, getHValue(ii1 / length, jj / width), ii1);
+				glm::vec3 p4 = glm::vec3(jj1, getHValue(ii1 / length, jj1 / width), ii1);
 
 				positions.push_back(p1);
 				positions.push_back(p2);
@@ -260,7 +268,12 @@ public:
 		return mesh;
 	}
 private:
-	int _seed;
-	std::default_random_engine _eng;
-	Map* _map;
+
+	float getHValue(float x, float y) {
+		return noise->octaveNoise(x, y, 6) * 20;
+	}
+
+	unsigned int dx;
+	unsigned int dz;
+	PerlinNoise* noise;
 };

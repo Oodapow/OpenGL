@@ -41,7 +41,7 @@ private:
 	Light light;
 	mCamera *camera;
 	int count = 4;
-	int size = 14;
+	int size = 100;
 	bool visible = false;
 
 	float windOffset = 0;

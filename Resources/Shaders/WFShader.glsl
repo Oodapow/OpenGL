@@ -49,7 +49,7 @@ void main()
     vec3 specular = light.specular * spec;  
 
 	float alpha = max(dot(normalize(viewPos - FragPos), norm), 0);
-	alpha = pow(alpha, 0.25);
+	alpha = pow(alpha, 0.5);
 
 	FragColor = mix(refleC, refraC, alpha);
 	FragColor = mix(FragColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2) + vec4(specular, 0.0);

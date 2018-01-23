@@ -28,15 +28,15 @@ void main()
     vec3 mdiffuse;
 
 	if(FragPos.y <= 0) {
-		float blue = - FragPos.y / 10.5;
+		float blue = - FragPos.y / 25;
 		float green = 0.25;
 		float red = 0.25;
 
 		mdiffuse = vec3(red, green, blue);
 	} else if(FragPos.y > 0) {
-		float red = 0.25 + FragPos.y / 10.5;
-		float blue = FragPos.y / 10.5;
-		float green = 0.25 + FragPos.y / 10.5;
+		float red = 0.25 + FragPos.y / 25;
+		float blue = FragPos.y / 25;
+		float green = 0.25 + FragPos.y / 25;
 
 		mdiffuse = vec3(red, green, blue);
 	}
