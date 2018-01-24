@@ -37,4 +37,7 @@ void main()
 	{
 		FragColor = txt * vec4(light.diffuse + light.ambient + specular * 0.2, 1.0);
 	}
+
+	float intens = max(dot(vec3(0, -1, 0), light.direction), 0.2);
+	FragColor = vec4(FragColor.xyz * intens, 1.0);
 }

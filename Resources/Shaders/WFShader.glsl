@@ -65,13 +65,18 @@ void main()
     vec3 specular = light.specular * spec;  
 
 	float alpha = max(dot(normalize(viewPos - FragPos), norm), 0);
-	alpha = pow(alpha, 0.5);
-
-	FragColor = mix(refleC, refraC, alpha);
-	FragColor = mix(FragColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2) + vec4(specular, 0.0);
+	alpha = pow(alpha, 0.25);
 
 	float d1 = LinearizeDepth(texture(depthMap, ndc).r);
 	float d2 = LinearizeDepth(gl_FragCoord.z);
 	float dw = d1 - d2;
+
+	float intens = max(dot(vec3(0, -1, 0), light.direction), 0.2);
+
+	float blueFactor = intens * (0.2 + smoothstep(0, 15, dw) * (0.75 - 0.2));
+	refraC = mix(refraC, vec4(0.604, 0.867, 0.851, 1.0), blueFactor);
+
+	FragColor = mix(refleC, refraC, alpha);
+	FragColor = FragColor + vec4(specular, 0.0);
 	FragColor.a = clamp(dw / 0.3, 0.0, 1.0);
 } 
