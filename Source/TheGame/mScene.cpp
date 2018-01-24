@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <random>
 
 #include <stb/stb_image.h>
@@ -12,7 +13,7 @@
 #include <Core/Managers/ResourcePath.h>
 
 #include <TheGame/mBuilder.h>
-#include <TheGame/mWatter.h>
+#include <TheGame/mWater.h>
 
 mScene::mScene()
 {
@@ -35,7 +36,7 @@ void mScene::Init()
 
 	{
 		camera = new mCamera();
-		camera->Pitch = -M_PI_4;
+		camera->Pitch = 0;
 		camera->Position = glm::vec3(2);
 		camera->UpdateCameraVectors();
 	}
@@ -49,30 +50,40 @@ void mScene::Init()
 	}
 
 	{
-		Builder b(size, size, 11);
-
-		auto mesh = b.GetMesh("terrain");
-		meshes[mesh->GetMeshID()] = mesh;
-
-		watter = new mWatter();
-		watter->mesh = "watter";
-		watter->shader = "watter";
-		watter->position = glm::vec3(0);
-		auto wmesh = watter->InitMesh(b.Getdx(), b.Getdz(), 0.0f,  1.0f);
+		water = new mWater();
+		water->mesh = "water";
+		water->shader = "water";
+		water->position = glm::vec3(0);
+		auto wmesh = water->InitMesh(300, 300, 0.0f, 1);
 		meshes[wmesh->GetMeshID()] = wmesh;
-		auto wshader = watter->InitShader();
+		auto wshader = water->InitShader();
 		shaders[wshader->GetName()] = wshader;
-		watter->BuildReflectionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
-		watter->BuildRefractionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
-		watter->InitTextureMaps();
+		water->BuildReflectionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
+		water->BuildRefractionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
+		water->InitTextureMaps();
 	}
 
 	{
-		mObject* obj = new mObject();
-		obj->mesh = "terrain";
-		obj->shader = "light";
-		obj->position = glm::vec3(0);
-		objects.push_back(obj);
+		int size = 100;
+		float line = 0.5;
+		Builder b(glm::vec2(size), glm::vec2(0), line, 11);
+		for (int i = -1; i < 2; i++) {
+			for (int j = -1; j < 2; j++) {
+				std::ostringstream ost;
+
+				ost << "terrain" << i << j;
+				b.position.x = line * size * i;
+				b.position.y = line * size * j;
+				auto mesh = b.GetMesh(ost.str());
+				meshes[mesh->GetMeshID()] = mesh;
+
+				mObject* obj = new mObject();
+				obj->mesh = ost.str();
+				obj->shader = "light";
+				obj->position = glm::vec3(b.position.x, 0, b.position.y);
+				objects.push_back(obj);
+			}
+		}
 	}
 
 	glEnable(GL_DEPTH_TEST);
@@ -93,7 +104,7 @@ void mScene::Update(float deltaTimeSeconds)
 	// render
 	// ------
 	// bind to framebuffer and draw scene as we normally would to color texture 
-	watter->BindReflectionBuffer();
+	water->BindReflectionBuffer();
 	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 
 							 // make sure we clear the framebuffer's content
@@ -102,7 +113,7 @@ void mScene::Update(float deltaTimeSeconds)
 	glEnable(GL_CLIP_DISTANCE0);
 	plane = glm::vec4(0, 1, 0, 0);
 
-	float distance = 2 * (camera->Position.y) - watter->position.y;
+	float distance = 2 * (camera->Position.y) - water->position.y;
 	camera->Position.y -= distance;
 	camera->InvertPitch();
 
@@ -114,7 +125,7 @@ void mScene::Update(float deltaTimeSeconds)
 	camera->InvertPitch();
 	camera->Position.y += distance;
 
-	watter->BindRefractionBuffer();
+	water->BindRefractionBuffer();
 
 	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
 
@@ -135,8 +146,8 @@ void mScene::Update(float deltaTimeSeconds)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable(GL_CLIP_DISTANCE0);
 
-	watter->BindTextures();
-	RenderObject(*watter);
+	water->BindTextures();
+	RenderObject(*water);
 
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
@@ -206,12 +217,12 @@ void mScene::RenderObject(const mObject& object)
 
 void mScene::OnInputUpdate(float deltaTime, int mods)
 {
-	if (window->KeyHold(GLFW_KEY_W)) camera->Position = camera->Position + camera->GetFront() * deltaTime * 4.0f;
-	if (window->KeyHold(GLFW_KEY_A)) camera->Position = camera->Position - camera->GetRight() * deltaTime * 4.0f;
-	if (window->KeyHold(GLFW_KEY_S)) camera->Position = camera->Position - camera->GetFront() * deltaTime * 4.0f;
-	if (window->KeyHold(GLFW_KEY_D)) camera->Position = camera->Position + camera->GetRight() * deltaTime * 4.0f;
-	if (window->KeyHold(GLFW_KEY_SPACE)) camera->Position = camera->Position + camera->GetUp() * deltaTime * 4.0f;
-	if (window->KeyHold(GLFW_KEY_SPACE) && (mods & GLFW_MOD_SHIFT) != 0) camera->Position = camera->Position - camera->GetUp() * deltaTime * 4.0f;
+	if (window->KeyHold(GLFW_KEY_W)) camera->Position = camera->Position + camera->GetFront() * deltaTime * cameraSpeed;
+	if (window->KeyHold(GLFW_KEY_A)) camera->Position = camera->Position - camera->GetRight() * deltaTime * cameraSpeed;
+	if (window->KeyHold(GLFW_KEY_S)) camera->Position = camera->Position - camera->GetFront() * deltaTime * cameraSpeed;
+	if (window->KeyHold(GLFW_KEY_D)) camera->Position = camera->Position + camera->GetRight() * deltaTime * cameraSpeed;
+	if (window->KeyHold(GLFW_KEY_SPACE)) camera->Position = camera->Position + camera->GetUp() * deltaTime * cameraSpeed;
+	if (window->KeyHold(GLFW_KEY_SPACE) && (mods & GLFW_MOD_SHIFT) != 0) camera->Position = camera->Position - camera->GetUp() * deltaTime * cameraSpeed;
 
 	if (window->KeyHold(GLFW_KEY_1))
 	{
@@ -228,40 +239,16 @@ void mScene::OnKeyPress(int key, int mods)
 {
 	if (key == GLFW_KEY_3)
 	{
-		delete meshes["terrain"];
-		meshes.erase("terrain");
-		Builder b(size, size, 10);
-		auto mesh = b.GetMesh("terrain");
-		meshes[mesh->GetMeshID()] = mesh;
+		float ncs = cameraSpeed + 1;
+		if (ncs > 5) ncs = 5;
+		cameraSpeed = ncs;
 	}
 
 	if (key == GLFW_KEY_4)
 	{
-		delete meshes["terrain"];
-		meshes.erase("terrain");
-		Builder b(size, size, 10);
-		auto mesh = b.GetMesh("terrain");
-		meshes[mesh->GetMeshID()] = mesh;
-	}
-
-	if (key == GLFW_KEY_5 && size > 3)
-	{
-		delete meshes["terrain"];
-		meshes.erase("terrain");
-		size--;
-		Builder b(size, size, 10);
-		auto mesh = b.GetMesh("terrain");
-		meshes[mesh->GetMeshID()] = mesh;
-	}
-
-	if (key == GLFW_KEY_6 && size < 14)
-	{
-		delete meshes["terrain"];
-		meshes.erase("terrain");
-		size++;
-		Builder b(size, size, 10);
-		auto mesh = b.GetMesh("terrain");
-		meshes[mesh->GetMeshID()] = mesh;
+		float ncs = cameraSpeed - 1;
+		if (ncs < 0) ncs = 0;
+		cameraSpeed = ncs;
 	}
 
 	if (key == GLFW_KEY_0)
@@ -315,6 +302,6 @@ void mScene::OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY)
 void mScene::OnWindowResize(int width, int height)
 {
 	{
-		watter->ResizeTextureBuffers(width, height);
+		water->ResizeTextureBuffers(width, height);
 	}
 }

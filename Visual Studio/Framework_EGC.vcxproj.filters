@@ -28,7 +28,7 @@
     <Filter Include="TheGame\Generators">
       <UniqueIdentifier>{edb185f0-4389-4d0f-b5aa-7878a9304d66}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TheGame\Watter">
+    <Filter Include="TheGame\Water">
       <UniqueIdentifier>{7dfb3239-7a09-4cc2-ba56-32145ee24642}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -76,11 +76,11 @@
     <ClCompile Include="..\Source\TheGame\mBuilder.cpp">
       <Filter>TheGame\Generators</Filter>
     </ClCompile>
-    <ClCompile Include="..\Source\TheGame\mWatter.cpp">
-      <Filter>TheGame\Watter</Filter>
-    </ClCompile>
     <ClCompile Include="..\Source\TheGame\mObject.cpp">
       <Filter>TheGame</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mWater.cpp">
+      <Filter>TheGame\Water</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -138,11 +138,11 @@
     <ClInclude Include="..\Source\TheGame\mBuilder.h">
       <Filter>TheGame\Generators</Filter>
     </ClInclude>
-    <ClInclude Include="..\Source\TheGame\mWatter.h">
-      <Filter>TheGame\Watter</Filter>
-    </ClInclude>
     <ClInclude Include="..\Source\TheGame\mObject.h">
       <Filter>TheGame</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mWater.h">
+      <Filter>TheGame\Water</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

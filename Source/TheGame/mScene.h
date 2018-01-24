@@ -1,6 +1,6 @@
 #pragma once
 #include "mCamera.h"
-#include "mWatter.h"
+#include "mWater.h"
 #include "mObject.h"
 
 struct Light {
@@ -40,15 +40,14 @@ private:
 
 	Light light;
 	mCamera *camera;
-	int count = 4;
-	int size = 100;
 	bool visible = false;
 
 	float windOffset = 0;
-	float windSpeed = 0.3;
+	float windSpeed = 0.02;
+	float cameraSpeed = 2;
 
 	std::vector<mObject*> objects;
-	mWatter* watter;
+	mWater* water;
 
 	glm::vec4 plane;
 };

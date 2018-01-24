@@ -35,7 +35,7 @@
     <ClCompile Include="..\Source\TheGame\mCamera.cpp" />
     <ClCompile Include="..\Source\TheGame\mObject.cpp" />
     <ClCompile Include="..\Source\TheGame\mScene.cpp" />
-    <ClCompile Include="..\Source\TheGame\mWatter.cpp" />
+    <ClCompile Include="..\Source\TheGame\mWater.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Source\Core\Engine.h" />
@@ -57,7 +57,7 @@
     <ClInclude Include="..\Source\TheGame\mCamera.h" />
     <ClInclude Include="..\Source\TheGame\mObject.h" />
     <ClInclude Include="..\Source\TheGame\mScene.h" />
-    <ClInclude Include="..\Source\TheGame\mWatter.h" />
+    <ClInclude Include="..\Source\TheGame\mWater.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shaders\FragmentShader.glsl" />

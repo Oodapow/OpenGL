@@ -6,7 +6,7 @@
 #include <Core/GPU/Texture2D.h>
 #include "mObject.h"
 
-class mWatter : public mObject{
+class mWater : public mObject{
 public:
 	void BuildReflectionBuffer(int width, int height) {
 		glGenFramebuffers(1, &reflectionFramebuffer);

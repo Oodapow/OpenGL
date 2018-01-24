@@ -172,7 +172,7 @@ public:
 class Builder 
 {
 public:
-	Builder(unsigned int dx, unsigned int dz, long unsigned int seed) : dx(dx), dz(dz) {
+	Builder(glm::vec2 resolution, glm::vec2 position, double lineLength, long unsigned int seed) : resolution(resolution), position(position), lineLength(lineLength){
 		noise = new PerlinNoise(seed);
 	};
 
@@ -180,19 +180,9 @@ public:
 		delete noise;
 	}
 
-	unsigned int Getdx() {
-		return dx;
-	}
-
-	unsigned int Getdz() {
-		return dz;
-	}
-
 	Mesh* GetMesh(std::string name) {
-		int width = dz;
-		int length = dx;
-
-		double lineLength = 1;
+		int width = resolution.x;
+		int length = resolution.y;
 		
 		std::vector<glm::vec3> positions;
 		std::vector<glm::vec3> normals;
@@ -201,8 +191,8 @@ public:
 
 		unsigned short index = 0;
 
-		for (int i = 0; i < length - 1; i++) {
-			for (int j = 0; j < width - 1; j++) {
+		for (int i = 0; i < length; i++) {
+			for (int j = 0; j < width; j++) {
 				float jj = (j - width / 2);
 				float ii = (i - length / 2);
 				float jj1 = jj + 1;
@@ -213,10 +203,10 @@ public:
 				jj *= lineLength;
 				jj1 *= lineLength;
 
-				glm::vec3 p1 = glm::vec3(jj, getHValue(ii / length, jj / width), ii);
-				glm::vec3 p2 = glm::vec3(jj1, getHValue(ii / length, jj1 / width), ii);
-				glm::vec3 p3 = glm::vec3(jj, getHValue(ii1 / length, jj / width), ii1);
-				glm::vec3 p4 = glm::vec3(jj1, getHValue(ii1 / length, jj1 / width), ii1);
+				glm::vec3 p1 = glm::vec3(jj, getHValue((ii + position.y) / length, (jj + position.x) / width), ii);
+				glm::vec3 p2 = glm::vec3(jj1, getHValue((ii + position.y) / length, (jj1 + position.x) / width), ii);
+				glm::vec3 p3 = glm::vec3(jj, getHValue((ii1 + position.y) / length, (jj + position.x) / width), ii1);
+				glm::vec3 p4 = glm::vec3(jj1, getHValue((ii1 + position.y) / length, (jj1 + position.x) / width), ii1);
 
 				positions.push_back(p1);
 				positions.push_back(p2);
@@ -267,13 +257,16 @@ public:
 		indices.clear();
 		return mesh;
 	}
+
+	glm::vec2 position;
+
 private:
 
-	float getHValue(float x, float y) {
-		return noise->octaveNoise(x, y, 6) * 20;
+	float getHValue(float y, float x) {
+		return noise->octaveNoise(x, y, 8) * 20;
 	}
 
-	unsigned int dx;
-	unsigned int dz;
+	double lineLength;
+	glm::vec2 resolution;
 	PerlinNoise* noise;
 };
