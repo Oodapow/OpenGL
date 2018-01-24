@@ -61,6 +61,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Resources\Shaders\FragmentShader.glsl" />
+    <None Include="..\Resources\Shaders\NVGS.glsl" />
+    <None Include="..\Resources\Shaders\NVVS.glsl" />
+    <None Include="..\Resources\Shaders\NVFS.glsl" />
     <None Include="..\Resources\Shaders\VertexShader.glsl" />
     <None Include="..\Resources\Shaders\WFShader.glsl" />
     <None Include="..\Resources\Shaders\WVShader.glsl" />

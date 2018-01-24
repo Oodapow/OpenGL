@@ -215,8 +215,8 @@ public:
 				positions.push_back(p4);
 				positions.push_back(p3);
 
-				glm::vec3 n1 = glm::normalize(glm::cross(p2 - p1, p3 - p1));
-				glm::vec3 n2 = glm::normalize(glm::cross(p3 - p4, p2 - p4));
+				glm::vec3 n1 = glm::normalize(glm::cross(p3 - p1, p2 - p1));
+				glm::vec3 n2 = glm::normalize(glm::cross(p2 - p4, p3 - p4));
 
 				normals.push_back(n1);
 				normals.push_back(n1);

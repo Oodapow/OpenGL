@@ -29,14 +29,47 @@ void mScene::Init()
 {
 	{
 		light.direction = glm::normalize(glm::vec3(0, -1.0f, 0));
-		light.ambient = glm::vec3(0.4f, 0.4f, 0.4f);
-		light.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+		light.ambient = glm::vec3(0.2f, 0.2f, 0.2f);
+		light.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
 		light.specular = glm::vec3(0.3f, 0.3f, 0.3f);
 	}
 
 	{
-		texture = new Texture2D();
-		texture->Load2D(RESOURCE_PATH::TEXTURES + "default.png");
+		texture_d = new Texture2D();
+		texture_d->Load2D(RESOURCE_PATH::TEXTURES + "grass_ground_d.jpg");
+
+		texture_s = new Texture2D();
+		texture_s->Load2D(RESOURCE_PATH::TEXTURES + "grass_ground_s.jpg");
+
+		texture_n = new Texture2D();
+		texture_n->Load2D(RESOURCE_PATH::TEXTURES + "grass_ground_n.jpg");
+
+		texture_d2 = new Texture2D();
+		texture_d2->Load2D(RESOURCE_PATH::TEXTURES + "snow_bumpy_d.jpg");
+
+		texture_s2 = new Texture2D();
+		texture_s2->Load2D(RESOURCE_PATH::TEXTURES + "snow_bumpy_s.jpg");
+
+		texture_n2 = new Texture2D();
+		texture_n2->Load2D(RESOURCE_PATH::TEXTURES + "snow_bumpy_n.jpg");
+
+		texture_d3 = new Texture2D();
+		texture_d3->Load2D(RESOURCE_PATH::TEXTURES + "snow_grass_d.jpg");
+
+		texture_s3 = new Texture2D();
+		texture_s3->Load2D(RESOURCE_PATH::TEXTURES + "snow_grass_s.jpg");
+
+		texture_n3 = new Texture2D();
+		texture_n3->Load2D(RESOURCE_PATH::TEXTURES + "snow_grass_n.jpg");
+
+		texture_d4 = new Texture2D();
+		texture_d4->Load2D(RESOURCE_PATH::TEXTURES + "ground_mud_d.jpg");
+
+		texture_s4 = new Texture2D();
+		texture_s4->Load2D(RESOURCE_PATH::TEXTURES + "ground_mud_s.jpg");
+
+		texture_n4 = new Texture2D();
+		texture_n4->Load2D(RESOURCE_PATH::TEXTURES + "ground_mud_n.jpg");
 	}
 
 	{
@@ -47,12 +80,32 @@ void mScene::Init()
 	}
 
 	{
+		Shader *shader = new Shader("nvs");
+		shader->AddShader(RESOURCE_PATH::SHADERS + "NVVS.glsl", GL_VERTEX_SHADER);
+		shader->AddShader(RESOURCE_PATH::SHADERS + "NVGS.glsl", GL_GEOMETRY_SHADER);
+		shader->AddShader(RESOURCE_PATH::SHADERS + "NVFS.glsl", GL_FRAGMENT_SHADER);
+		shader->CreateAndLink();
+		shaders[shader->GetName()] = shader;
+	}
+
+	{
 		Shader *shader = new Shader("light");
 		shader->AddShader(RESOURCE_PATH::SHADERS + "VertexShader.glsl", GL_VERTEX_SHADER);
 		shader->AddShader(RESOURCE_PATH::SHADERS + "FragmentShader.glsl", GL_FRAGMENT_SHADER);
 		shader->CreateAndLink();
 		shaders[shader->GetName()] = shader;
-		shader->loc_textures[0] = glGetUniformLocation(shader->GetProgramID(), "texture");
+		shader->loc_textures[0] = glGetUniformLocation(shader->GetProgramID(), "texture_d");
+		shader->loc_textures[1] = glGetUniformLocation(shader->GetProgramID(), "texture_s");
+		shader->loc_textures[2] = glGetUniformLocation(shader->GetProgramID(), "texture_n"); 
+		shader->loc_textures[3] = glGetUniformLocation(shader->GetProgramID(), "texture_d2");
+		shader->loc_textures[4] = glGetUniformLocation(shader->GetProgramID(), "texture_s2");
+		shader->loc_textures[5] = glGetUniformLocation(shader->GetProgramID(), "texture_n2");
+		shader->loc_textures[6] = glGetUniformLocation(shader->GetProgramID(), "texture_d3");
+		shader->loc_textures[7] = glGetUniformLocation(shader->GetProgramID(), "texture_s3");
+		shader->loc_textures[8] = glGetUniformLocation(shader->GetProgramID(), "texture_n3");
+		shader->loc_textures[9] = glGetUniformLocation(shader->GetProgramID(), "texture_d4");
+		shader->loc_textures[10] = glGetUniformLocation(shader->GetProgramID(), "texture_s4");
+		shader->loc_textures[11] = glGetUniformLocation(shader->GetProgramID(), "texture_n4");
 	}
 
 	{
@@ -123,7 +176,18 @@ void mScene::Update(float deltaTimeSeconds)
 	camera->Position.y -= distance;
 	camera->InvertPitch();
 
-	texture->BindToTextureUnit(GL_TEXTURE0);
+	texture_d->BindToTextureUnit(GL_TEXTURE0);
+	texture_s->BindToTextureUnit(GL_TEXTURE1);
+	texture_n->BindToTextureUnit(GL_TEXTURE2);
+	texture_d2->BindToTextureUnit(GL_TEXTURE3);
+	texture_s2->BindToTextureUnit(GL_TEXTURE4);
+	texture_n2->BindToTextureUnit(GL_TEXTURE5);
+	texture_d3->BindToTextureUnit(GL_TEXTURE6);
+	texture_s3->BindToTextureUnit(GL_TEXTURE7);
+	texture_n3->BindToTextureUnit(GL_TEXTURE8);
+	texture_d4->BindToTextureUnit(GL_TEXTURE9);
+	texture_s4->BindToTextureUnit(GL_TEXTURE10);
+	texture_n4->BindToTextureUnit(GL_TEXTURE11);
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
@@ -141,7 +205,18 @@ void mScene::Update(float deltaTimeSeconds)
 	glEnable(GL_CLIP_DISTANCE0);
 	plane = glm::vec4(0, -1, 0, 0);
 
-	texture->BindToTextureUnit(GL_TEXTURE0);
+	texture_d->BindToTextureUnit(GL_TEXTURE0);
+	texture_s->BindToTextureUnit(GL_TEXTURE1);
+	texture_n->BindToTextureUnit(GL_TEXTURE2);
+	texture_d2->BindToTextureUnit(GL_TEXTURE3);
+	texture_s2->BindToTextureUnit(GL_TEXTURE4);
+	texture_n2->BindToTextureUnit(GL_TEXTURE5);
+	texture_d3->BindToTextureUnit(GL_TEXTURE6);
+	texture_s3->BindToTextureUnit(GL_TEXTURE7);
+	texture_n3->BindToTextureUnit(GL_TEXTURE8);
+	texture_d4->BindToTextureUnit(GL_TEXTURE9);
+	texture_s4->BindToTextureUnit(GL_TEXTURE10);
+	texture_n4->BindToTextureUnit(GL_TEXTURE11);
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
@@ -157,10 +232,32 @@ void mScene::Update(float deltaTimeSeconds)
 	water->BindTextures();
 	RenderObject(*water);
 
-	texture->BindToTextureUnit(GL_TEXTURE0);
+	texture_d->BindToTextureUnit(GL_TEXTURE0);
+	texture_s->BindToTextureUnit(GL_TEXTURE1);
+	texture_n->BindToTextureUnit(GL_TEXTURE2);
+	texture_d2->BindToTextureUnit(GL_TEXTURE3);
+	texture_s2->BindToTextureUnit(GL_TEXTURE4);
+	texture_n2->BindToTextureUnit(GL_TEXTURE5);
+	texture_d3->BindToTextureUnit(GL_TEXTURE6);
+	texture_s3->BindToTextureUnit(GL_TEXTURE7);
+	texture_n3->BindToTextureUnit(GL_TEXTURE8);
+	texture_d4->BindToTextureUnit(GL_TEXTURE9);
+	texture_s4->BindToTextureUnit(GL_TEXTURE10);
+	texture_n4->BindToTextureUnit(GL_TEXTURE11);
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
+	}
+
+	if (useNvs) 
+	{
+		for (auto it = objects.begin(); it != objects.end(); it++)
+		{
+			std::string last = (*it)->shader;
+			(*it)->shader = "nvs";
+			RenderObject(*(*it));
+			(*it)->shader = last;
+		}
 	}
 }
 
@@ -192,11 +289,6 @@ void mScene::RenderObject(const mObject& object)
 	shaders[object.shader]->setVec3("light.ambient", light.ambient);
 	shaders[object.shader]->setVec3("light.diffuse", light.diffuse);
 	shaders[object.shader]->setVec3("light.specular", light.specular);
-
-	shaders[object.shader]->setVec3("material.ambient", glm::vec3(0.3));
-	shaders[object.shader]->setVec3("material.diffuse", glm::vec3(0.6));
-	shaders[object.shader]->setVec3("material.specular", glm::vec3(0.2));
-	shaders[object.shader]->setFloat("material.shininess", 4);
 
 	shaders[object.shader]->setVec3("viewPos", camera->Position);
 	
@@ -279,6 +371,12 @@ void mScene::OnKeyPress(int key, int mods)
 			(*it).second->Reload();
 		}
 	}
+
+	if (key == GLFW_KEY_8)
+	{
+		useNvs = !useNvs;
+	}
+
 }
 
 void mScene::OnKeyRelease(int key, int mods)

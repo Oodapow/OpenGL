@@ -78,6 +78,8 @@ public:
 
 		normalMap->BindToTextureUnit(GL_TEXTURE2);
 		dudvMap->BindToTextureUnit(GL_TEXTURE3);
+
+		glActiveTexture(GL_TEXTURE0);
 	}
 
 	void InitTextureMaps() {

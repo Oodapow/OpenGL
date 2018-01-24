@@ -40,7 +40,9 @@ private:
 
 	Light light;
 	mCamera *camera;
+
 	bool visible = false;
+	bool useNvs = false;
 
 	float windOffset = 0;
 	float windSpeed = 0.02;
@@ -49,7 +51,21 @@ private:
 	std::vector<mObject*> objects;
 	mWater* water;
 
-	Texture2D* texture;
+	Texture2D* texture_d;
+	Texture2D* texture_n;
+	Texture2D* texture_s;
+
+	Texture2D* texture_d2;
+	Texture2D* texture_n2;
+	Texture2D* texture_s2;
+
+	Texture2D* texture_d3;
+	Texture2D* texture_n3;
+	Texture2D* texture_s3;
+
+	Texture2D* texture_d4;
+	Texture2D* texture_n4;
+	Texture2D* texture_s4;
 
 	glm::vec4 plane;
 };
