@@ -2,6 +2,7 @@
 #include <include/gl.h>
 #include <include/utils.h>
 #include <string>
+#include <vector>
 
 class Texture2D
 {
@@ -21,6 +22,9 @@ class Texture2D
 		void CreateU16(const unsigned short* img, int width, int height, int chn);
 
 		bool Load2D(std::string fileName, GLenum wrappingMode = GL_REPEAT);
+
+		bool LoadCubeMap(const std::vector<std::string>& faces);
+
 		void SaveToFile(const char* fileName) const;
 
 		unsigned int GetWidth() const;
@@ -37,9 +41,9 @@ class Texture2D
 		void Init2DTexture(unsigned int width, unsigned int height, unsigned int channels);
 
 	private:
-		unsigned int width;
-		unsigned int height;
-		unsigned int channels;
+		int width;
+		int height;
+		int channels;
 		GLuint targetType;
 		GLuint textureID;
 		GLenum wrappingMode;

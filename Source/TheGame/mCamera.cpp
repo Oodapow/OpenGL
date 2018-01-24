@@ -32,10 +32,10 @@ glm::mat4 mCamera::GetViewMatrix() const
 	return glm::lookAt(Position , Position + front, up);
 }
 
-glm::mat4 mCamera::GetPerspectiveMatrix() const
+glm::mat4 mCamera::GetPerspectiveMatrix(float viewDistance) const
 {
 	auto wnd = Engine::GetWindow();
-	return glm::perspective(glm::radians(Zoom), (float)wnd->GetResolution().x / (float)wnd->GetResolution().y, 0.1f, 100.0f);
+	return glm::perspective(glm::radians(Zoom), (float)wnd->GetResolution().x / (float)wnd->GetResolution().y, 0.1f, viewDistance);
 }
 
 void mCamera::UpdateCameraVectors()

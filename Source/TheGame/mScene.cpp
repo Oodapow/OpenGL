@@ -113,13 +113,25 @@ void mScene::Init()
 		water->mesh = "water";
 		water->shader = "water";
 		water->position = glm::vec3(0);
-		auto wmesh = water->InitMesh(300, 300, 0.0f, 1);
+		auto wmesh = water->InitMesh(150, 150, 0.0f, 1);
 		meshes[wmesh->GetMeshID()] = wmesh;
 		auto wshader = water->InitShader();
 		shaders[wshader->GetName()] = wshader;
 		water->BuildReflectionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
 		water->BuildRefractionBuffer(Engine::GetWindow()->GetResolution().x, Engine::GetWindow()->GetResolution().y);
 		water->InitTextureMaps();
+	}
+
+	{
+		skybox = new mSkyBox();
+		skybox->mesh = "sbox";
+		skybox->shader = "sbox";
+		skybox->position = glm::vec3(0);
+		auto mesh = skybox->InitMesh(150);
+		meshes[mesh->GetMeshID()] = mesh;
+		auto shader = skybox->InitShader();
+		shaders[shader->GetName()] = shader;
+		skybox->InitTextureMaps();
 	}
 
 	{
@@ -150,31 +162,21 @@ void mScene::Init()
 
 void mScene::FrameStart()
 {
-	// clears the color buffer (using the previously set color) and depth buffer
-	glClearColor(0.2, 0.3, 0.7, 1);
+	glClearColor(0.0, 0.0, 0.0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDisable(GL_CLIP_DISTANCE0);
+	glEnable(GL_DEPTH_TEST);
 }
 
-void mScene::Update(float deltaTimeSeconds)
+void mScene::RenderObjects(glm::vec4 plane)
 {
-	windOffset += deltaTimeSeconds * windSpeed;
-	camera->UpdateCameraVectors();
+	bool w = false;
 
-	// render
-	// ------
-	// bind to framebuffer and draw scene as we normally would to color texture 
-	water->BindReflectionBuffer();
-	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-
-							 // make sure we clear the framebuffer's content
-	glClearColor(0.2, 0.3, 0.7, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_CLIP_DISTANCE0);
-	plane = glm::vec4(0, 1, 0, 0);
-
-	float distance = 2 * (camera->Position.y) - water->position.y;
-	camera->Position.y -= distance;
-	camera->InvertPitch();
+	if (glm::length(plane) > 0.001) {
+		glEnable(GL_CLIP_DISTANCE0);
+		this->plane = plane;
+		w = true;
+	}
 
 	texture_d->BindToTextureUnit(GL_TEXTURE0);
 	texture_s->BindToTextureUnit(GL_TEXTURE1);
@@ -191,6 +193,79 @@ void mScene::Update(float deltaTimeSeconds)
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
+	}
+
+	if (w) 
+	{
+		glDisable(GL_CLIP_DISTANCE0);
+	}
+}
+
+void mScene::RenderBox(glm::vec4 plane)
+{
+	bool w = false;
+
+	if (glm::length(plane) > 0.001) {
+		glEnable(GL_CLIP_DISTANCE0);
+		this->plane = plane;
+		w = true;
+	}
+
+	glDepthFunc(GL_LEQUAL);
+	skybox->BindTextures();
+	RenderObject(*skybox);
+	glDepthFunc(GL_LESS);
+
+	if (w)
+	{
+		glDisable(GL_CLIP_DISTANCE0);
+	}
+}
+
+void mScene::RenderObjectsWithNormals()
+{
+	texture_d->BindToTextureUnit(GL_TEXTURE0);
+	texture_s->BindToTextureUnit(GL_TEXTURE1);
+	texture_n->BindToTextureUnit(GL_TEXTURE2);
+	texture_d2->BindToTextureUnit(GL_TEXTURE3);
+	texture_s2->BindToTextureUnit(GL_TEXTURE4);
+	texture_n2->BindToTextureUnit(GL_TEXTURE5);
+	texture_d3->BindToTextureUnit(GL_TEXTURE6);
+	texture_s3->BindToTextureUnit(GL_TEXTURE7);
+	texture_n3->BindToTextureUnit(GL_TEXTURE8);
+	texture_d4->BindToTextureUnit(GL_TEXTURE9);
+	texture_s4->BindToTextureUnit(GL_TEXTURE10);
+	texture_n4->BindToTextureUnit(GL_TEXTURE11);
+
+	for (auto it = objects.begin(); it != objects.end(); it++)
+	{
+		std::string last = (*it)->shader;
+		(*it)->shader = "nvs";
+		RenderObject(*(*it));
+		(*it)->shader = last;
+	}
+}
+
+void mScene::RenderWater()
+{
+	water->BindReflectionBuffer();
+
+	float distance = 2 * (camera->Position.y) - water->position.y;
+	camera->Position.y -= distance;
+	camera->InvertPitch();
+
+	glClearColor(0.0, 0.0, 0.0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	if (camera->Position.y < -0.1) 
+	{
+		RenderBox(glm::vec4(0, 1, 0, 0));
+		RenderObjects(glm::vec4(0, 1, 0, 0));
+	}
+	else
+	{
+		RenderObjects();
 	}
 
 	camera->InvertPitch();
@@ -198,66 +273,36 @@ void mScene::Update(float deltaTimeSeconds)
 
 	water->BindRefractionBuffer();
 
-	glEnable(GL_DEPTH_TEST); // enable depth testing (is disabled for rendering screen-space quad)
-
-	glClearColor(0.2, 0.3, 0.7, 1);
+	glClearColor(0.0, 0.0, 0.0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_CLIP_DISTANCE0);
-	plane = glm::vec4(0, -1, 0, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 
-	texture_d->BindToTextureUnit(GL_TEXTURE0);
-	texture_s->BindToTextureUnit(GL_TEXTURE1);
-	texture_n->BindToTextureUnit(GL_TEXTURE2);
-	texture_d2->BindToTextureUnit(GL_TEXTURE3);
-	texture_s2->BindToTextureUnit(GL_TEXTURE4);
-	texture_n2->BindToTextureUnit(GL_TEXTURE5);
-	texture_d3->BindToTextureUnit(GL_TEXTURE6);
-	texture_s3->BindToTextureUnit(GL_TEXTURE7);
-	texture_n3->BindToTextureUnit(GL_TEXTURE8);
-	texture_d4->BindToTextureUnit(GL_TEXTURE9);
-	texture_s4->BindToTextureUnit(GL_TEXTURE10);
-	texture_n4->BindToTextureUnit(GL_TEXTURE11);
-	for (auto it = objects.begin(); it != objects.end(); it++)
-	{
-		RenderObject(*(*it));
-	}
+	RenderObjects(glm::vec4(0, -1, 0, 0));
 
-	// now bind back to default framebuffer and draw a quad plane with the attached framebuffer color texture
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	// clears the color buffer (using the previously set color) and depth buffer
-	glClearColor(0.2, 0.3, 0.7, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable(GL_CLIP_DISTANCE0);
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	water->BindTextures();
 	RenderObject(*water);
+	glDisable(GL_BLEND);
+}
 
-	texture_d->BindToTextureUnit(GL_TEXTURE0);
-	texture_s->BindToTextureUnit(GL_TEXTURE1);
-	texture_n->BindToTextureUnit(GL_TEXTURE2);
-	texture_d2->BindToTextureUnit(GL_TEXTURE3);
-	texture_s2->BindToTextureUnit(GL_TEXTURE4);
-	texture_n2->BindToTextureUnit(GL_TEXTURE5);
-	texture_d3->BindToTextureUnit(GL_TEXTURE6);
-	texture_s3->BindToTextureUnit(GL_TEXTURE7);
-	texture_n3->BindToTextureUnit(GL_TEXTURE8);
-	texture_d4->BindToTextureUnit(GL_TEXTURE9);
-	texture_s4->BindToTextureUnit(GL_TEXTURE10);
-	texture_n4->BindToTextureUnit(GL_TEXTURE11);
-	for (auto it = objects.begin(); it != objects.end(); it++)
-	{
-		RenderObject(*(*it));
-	}
+void mScene::Update(float deltaTimeSeconds)
+{
+	windOffset += deltaTimeSeconds * windSpeed;
+	camera->UpdateCameraVectors();
 
-	if (useNvs) 
+	RenderObjects();
+
+	RenderWater();
+
+	RenderBox();
+
+	if (useNvs)
 	{
-		for (auto it = objects.begin(); it != objects.end(); it++)
-		{
-			std::string last = (*it)->shader;
-			(*it)->shader = "nvs";
-			RenderObject(*(*it));
-			(*it)->shader = last;
-		}
+		RenderObjectsWithNormals();
 	}
 }
 
@@ -293,7 +338,7 @@ void mScene::RenderObject(const mObject& object)
 	shaders[object.shader]->setVec3("viewPos", camera->Position);
 	
 	shaders[object.shader]->setMat4("view", camera->GetViewMatrix());
-	shaders[object.shader]->setMat4("projection", camera->GetPerspectiveMatrix());
+	shaders[object.shader]->setMat4("projection", camera->GetPerspectiveMatrix(viewDistance));
 
 	glm::mat4 modelMatrix(1);
 	{
@@ -341,7 +386,7 @@ void mScene::OnKeyPress(int key, int mods)
 	if (key == GLFW_KEY_3)
 	{
 		float ncs = cameraSpeed + 1;
-		if (ncs > 5) ncs = 5;
+		if (ncs > 7) ncs = 7;
 		cameraSpeed = ncs;
 	}
 
@@ -350,6 +395,17 @@ void mScene::OnKeyPress(int key, int mods)
 		float ncs = cameraSpeed - 1;
 		if (ncs < 0) ncs = 0;
 		cameraSpeed = ncs;
+	}
+
+	if (key == GLFW_KEY_5)
+	{
+		viewDistance += 10;
+	}
+
+	if (key == GLFW_KEY_6)
+	{
+		viewDistance -= 10;
+
 	}
 
 	if (key == GLFW_KEY_0)

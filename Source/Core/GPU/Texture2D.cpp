@@ -88,6 +88,35 @@ bool Texture2D::Load2D(std::string fileName, GLenum wrapping_mode)
 	return true;
 }
 
+bool Texture2D::LoadCubeMap(const std::vector<std::string>& faces)
+{
+	glGenTextures(1, &textureID);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		unsigned char *data = stbi_load(faces[i].c_str(), &width, &height, &channels, 0);
+		if (data)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+			);
+			stbi_image_free(data);
+		}
+		else
+		{
+			std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+			stbi_image_free(data);
+			return false;
+		}
+	}
+
+	wrappingMode = GL_CLAMP_TO_EDGE;
+	targetType = GL_TEXTURE_CUBE_MAP;
+	SetTextureParameters();
+	return true;
+}
+
 void Texture2D::SaveToFile(const char * fileName) const
 {
 	unsigned char *data = new unsigned char[width * height * channels];
@@ -150,6 +179,7 @@ void Texture2D::SetTextureParameters()
 	glTexParameteri(targetType, GL_TEXTURE_MAG_FILTER, textureMagFilter);
 	glTexParameteri(targetType, GL_TEXTURE_WRAP_S, wrappingMode);
 	glTexParameteri(targetType, GL_TEXTURE_WRAP_T, wrappingMode);
+	if (targetType == GL_TEXTURE_CUBE_MAP) glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, wrappingMode);
 	glTexParameterf(targetType, GL_TEXTURE_MAX_ANISOTROPY_EXT, 4);
 }
 

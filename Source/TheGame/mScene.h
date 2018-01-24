@@ -2,6 +2,7 @@
 #include "mCamera.h"
 #include "mWater.h"
 #include "mObject.h"
+#include "mSkyBox.h"
 #include <Core/GPU/Texture2D.h>
 struct Light {
 	glm::vec3 direction;
@@ -35,6 +36,11 @@ private:
 	void OnMouseScroll(int mouseX, int mouseY, int offsetX, int offsetY) override;
 	void OnWindowResize(int width, int height) override;
 
+	void RenderObjects(glm::vec4 plane = glm::vec4(0));
+	void RenderBox(glm::vec4 plane = glm::vec4(0));
+	void RenderObjectsWithNormals();
+	void RenderWater();
+
 	std::unordered_map<std::string, Mesh*> meshes;
 	std::unordered_map<std::string, Shader*> shaders;
 
@@ -47,9 +53,11 @@ private:
 	float windOffset = 0;
 	float windSpeed = 0.02;
 	float cameraSpeed = 2;
+	float viewDistance = 150.0f;
 
 	std::vector<mObject*> objects;
 	mWater* water;
+	mSkyBox* skybox;
 
 	Texture2D* texture_d;
 	Texture2D* texture_n;

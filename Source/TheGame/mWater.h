@@ -43,17 +43,21 @@ public:
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, refractionTextureColorbuffer, 0);
 		// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-		glGenRenderbuffers(1, &refractionRbo);
-		glBindRenderbuffer(GL_RENDERBUFFER, refractionRbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, refractionRbo); // now actually attach it
-																												// now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+
+		glGenTextures(1, &refractionRbo);
+		glBindTexture(GL_TEXTURE_2D, refractionRbo);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, refractionRbo, 0);
+		
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 			std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 
 		_shader->loc_textures[1] = glGetUniformLocation(_shader->program, "refraction");
+		_shader->loc_textures[4] = glGetUniformLocation(_shader->program, "depthMap");
 	}
 
 	void ResizeTextureBuffers(int width, int height) {
@@ -78,6 +82,9 @@ public:
 
 		normalMap->BindToTextureUnit(GL_TEXTURE2);
 		dudvMap->BindToTextureUnit(GL_TEXTURE3);
+
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, refractionRbo);
 
 		glActiveTexture(GL_TEXTURE0);
 	}

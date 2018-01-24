@@ -28,8 +28,26 @@
     <Filter Include="TheGame\Generators">
       <UniqueIdentifier>{edb185f0-4389-4d0f-b5aa-7878a9304d66}</UniqueIdentifier>
     </Filter>
-    <Filter Include="TheGame\Water">
+    <Filter Include="TheGame\Effects">
+      <UniqueIdentifier>{8046aa79-479e-4e01-b489-fab92e7151ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TheGame\Effects\Water">
       <UniqueIdentifier>{7dfb3239-7a09-4cc2-ba56-32145ee24642}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="TheGame\Effects\SkyBox">
+      <UniqueIdentifier>{669784cc-21b1-4d3d-81ea-2d702f4a2ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders\Box">
+      <UniqueIdentifier>{7662b25d-eda3-49af-ba52-f706bfe1f617}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders\Utils">
+      <UniqueIdentifier>{77cf69f9-ec4b-4d2e-b440-da8942e07cc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders\Water">
+      <UniqueIdentifier>{0f08e6be-ac3d-4ba1-95f9-fffb8d695fae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Shaders\Terrain">
+      <UniqueIdentifier>{0d63ae8e-2417-4b4d-a0ff-649d0967e595}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,7 +98,10 @@
       <Filter>TheGame</Filter>
     </ClCompile>
     <ClCompile Include="..\Source\TheGame\mWater.cpp">
-      <Filter>TheGame\Water</Filter>
+      <Filter>TheGame\Effects\Water</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Source\TheGame\mSkyBox.cpp">
+      <Filter>TheGame\Effects\SkyBox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,30 +163,39 @@
       <Filter>TheGame</Filter>
     </ClInclude>
     <ClInclude Include="..\Source\TheGame\mWater.h">
-      <Filter>TheGame\Water</Filter>
+      <Filter>TheGame\Effects\Water</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Source\TheGame\mSkyBox.h">
+      <Filter>TheGame\Effects\SkyBox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Resources\Shaders\FragmentShader.glsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="..\Resources\Shaders\VertexShader.glsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="..\Resources\Shaders\WFShader.glsl">
-      <Filter>Resources\Shaders</Filter>
-    </None>
-    <None Include="..\Resources\Shaders\WVShader.glsl">
-      <Filter>Resources\Shaders</Filter>
+    <None Include="..\Resources\Shaders\NVFS.glsl">
+      <Filter>Resources\Shaders\Utils</Filter>
     </None>
     <None Include="..\Resources\Shaders\NVGS.glsl">
-      <Filter>Resources\Shaders</Filter>
+      <Filter>Resources\Shaders\Utils</Filter>
     </None>
     <None Include="..\Resources\Shaders\NVVS.glsl">
-      <Filter>Resources\Shaders</Filter>
+      <Filter>Resources\Shaders\Utils</Filter>
     </None>
-    <None Include="..\Resources\Shaders\NVFS.glsl">
-      <Filter>Resources\Shaders</Filter>
+    <None Include="..\Resources\Shaders\BoxFragmentShader.glsl">
+      <Filter>Resources\Shaders\Box</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\BoxVertexShader.glsl">
+      <Filter>Resources\Shaders\Box</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\WFShader.glsl">
+      <Filter>Resources\Shaders\Water</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\WVShader.glsl">
+      <Filter>Resources\Shaders\Water</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\FragmentShader.glsl">
+      <Filter>Resources\Shaders\Terrain</Filter>
+    </None>
+    <None Include="..\Resources\Shaders\VertexShader.glsl">
+      <Filter>Resources\Shaders\Terrain</Filter>
     </None>
   </ItemGroup>
 </Project>

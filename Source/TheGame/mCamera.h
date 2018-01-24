@@ -32,7 +32,7 @@ public:
 	glm::vec3 GetRight() const;
 
 	glm::mat4 GetViewMatrix() const;
-	glm::mat4 GetPerspectiveMatrix() const;
+	glm::mat4 GetPerspectiveMatrix(float viewDistance) const;
 
 	void UpdateCameraVectors();
 	void InvertPitch();

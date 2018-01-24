@@ -18,9 +18,20 @@ uniform sampler2D reflection;
 uniform sampler2D refraction;
 uniform sampler2D dudvMap;
 uniform sampler2D normalMap;
+uniform sampler2D depthMap;
+
 uniform float windOffset;
 
 const float waveStrength = 0.05;
+
+float near = 0.1; 
+float far  = 1000.0; 
+  
+float LinearizeDepth(float depth) 
+{
+    float z = depth * 2.0 - 1.0; // back to NDC 
+    return (2.0 * near * far) / (far + near - z * (far - near));	
+}
 
 void main()
 {
@@ -39,6 +50,11 @@ void main()
 	vec4 refleC = texture(reflection, refleTc);
 	vec4 refraC = texture(refraction, refraTc);
 
+	if (length(vec3(refraC)) < 0.1) 
+	{
+		refraC = texture(refraction, ndc);
+	}
+
 	vec4 normC = texture(normalMap, vec2(TexCoords.x + windOffset, TexCoords.y + windOffset))
 					+ texture(normalMap, vec2(TexCoords.x - windOffset, TexCoords.y));
 	vec3 norm = vec3(normC.r - 1.0, normC.b / 2, normC.g - 1.0);
@@ -53,4 +69,9 @@ void main()
 
 	FragColor = mix(refleC, refraC, alpha);
 	FragColor = mix(FragColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2) + vec4(specular, 0.0);
+
+	float d1 = LinearizeDepth(texture(depthMap, ndc).r);
+	float d2 = LinearizeDepth(gl_FragCoord.z);
+	float dw = d1 - d2;
+	FragColor.a = clamp(dw / 0.3, 0.0, 1.0);
 } 
