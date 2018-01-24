@@ -2,7 +2,7 @@
 #include "mCamera.h"
 #include "mWater.h"
 #include "mObject.h"
-
+#include <Core/GPU/Texture2D.h>
 struct Light {
 	glm::vec3 direction;
 	glm::vec3 ambient;
@@ -48,6 +48,8 @@ private:
 
 	std::vector<mObject*> objects;
 	mWater* water;
+
+	Texture2D* texture;
 
 	glm::vec4 plane;
 };

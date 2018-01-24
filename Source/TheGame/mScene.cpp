@@ -35,6 +35,11 @@ void mScene::Init()
 	}
 
 	{
+		texture = new Texture2D();
+		texture->Load2D(RESOURCE_PATH::TEXTURES + "default.png");
+	}
+
+	{
 		camera = new mCamera();
 		camera->Pitch = 0;
 		camera->Position = glm::vec3(2);
@@ -47,6 +52,7 @@ void mScene::Init()
 		shader->AddShader(RESOURCE_PATH::SHADERS + "FragmentShader.glsl", GL_FRAGMENT_SHADER);
 		shader->CreateAndLink();
 		shaders[shader->GetName()] = shader;
+		shader->loc_textures[0] = glGetUniformLocation(shader->GetProgramID(), "texture");
 	}
 
 	{
@@ -117,6 +123,7 @@ void mScene::Update(float deltaTimeSeconds)
 	camera->Position.y -= distance;
 	camera->InvertPitch();
 
+	texture->BindToTextureUnit(GL_TEXTURE0);
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
@@ -134,6 +141,7 @@ void mScene::Update(float deltaTimeSeconds)
 	glEnable(GL_CLIP_DISTANCE0);
 	plane = glm::vec4(0, -1, 0, 0);
 
+	texture->BindToTextureUnit(GL_TEXTURE0);
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
@@ -149,6 +157,7 @@ void mScene::Update(float deltaTimeSeconds)
 	water->BindTextures();
 	RenderObject(*water);
 
+	texture->BindToTextureUnit(GL_TEXTURE0);
 	for (auto it = objects.begin(); it != objects.end(); it++)
 	{
 		RenderObject(*(*it));
